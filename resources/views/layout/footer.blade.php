@@ -1,3 +1,4 @@
+<x-google-ads :location="\App\Enum\AdZoneLocation::FOOTER->value" />
 <footer class="relative pt-40 text-white bg-black site-footer pb-11">
 	<div class="absolute inset-0" style="background: radial-gradient(circle at 0% -20%, #a12a91, rgba(33, 13, 123, 0.83), transparent, transparent, transparent)">
 	</div>

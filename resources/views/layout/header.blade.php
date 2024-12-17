@@ -72,3 +72,4 @@
 	</a>
 </div>
 @endif
+<x-google-ads :location="\App\Enum\AdZoneLocation::HEADER->value" />

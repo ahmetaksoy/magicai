@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdZoneController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\AdminController;
@@ -23,7 +24,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\GoogleTTSController;
 
 
-Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]], function() {
+Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath']], function () {
     Route::prefix('dashboard')->middleware('auth')->name('dashboard.')->group(function () {
 
         Route::get('/', [UserController::class, 'redirect'])->name('index');
@@ -67,7 +68,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
                 Route::prefix('chat')->name('chat.')->group(function () {
                     Route::get('/ai-chat-list', [AIChatController::class, 'openAIChatList'])->name('list');
                     Route::get('/ai-chat/{slug}', [AIChatController::class, 'openAIChat'])->name('chat');
-                    Route::match(['get', 'post'],'/chat-send', [AIChatController::class, 'chatOutput']);
+                    Route::match(['get', 'post'], '/chat-send', [AIChatController::class, 'chatOutput']);
                     Route::post('/open-chat-area-container', [AIChatController::class, 'openChatAreaContainer']);
                     Route::post('/start-new-chat', [AIChatController::class, 'startNewChat']);
                     Route::post('/search', [AIChatController::class, 'search']);
@@ -123,8 +124,6 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
                 Route::post('/send-invitation', [UserController::class, 'affiliatesListSendInvitation']);
                 Route::post('/send-request', [UserController::class, 'affiliatesListSendRequest']);
             });
-
-
 
 
         });
@@ -303,6 +302,15 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
                     Route::post('/action/save', [AdminController::class, 'frontendGeneratorlistCreateOrUpdateSave']);
                 });
 
+                Route::prefix('ad-zones')->name('adZone.')->group(function () {
+                    Route::get('/', [AdZoneController::class, 'index'])->name('index');
+                    Route::get('/show/{adZone}', [AdZoneController::class, 'show'])->name('show');
+                    Route::get('/create', [AdZoneController::class, 'create'])->name('create');
+                    Route::post('/store', [AdZoneController::class, 'store'])->name('store');
+                    Route::put('/update/{adZone}', [AdZoneController::class, 'update'])->name('update');
+                    Route::delete('/destroy/{adZone}', [AdZoneController::class, 'destroy'])->name('destroy');
+                });
+
             });
 
             //Update
@@ -352,12 +360,10 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
         Route::post('/api/search', [SearchController::class, 'search']);
 
 
-
-
     });
 
     // Override amamarul routes
-    Route::group(['prefix' => config('amamarul-location.prefix'), 'middleware' => config('amamarul-location.middlewares') ,'as' => 'amamarul.translations.'], function(){
+    Route::group(['prefix' => config('amamarul-location.prefix'), 'middleware' => config('amamarul-location.middlewares'), 'as' => 'amamarul.translations.'], function () {
         Route::get('/', '\Amamarul\LaravelJsonLocationsManager\Controllers\HomeController@index')->name('home');
         Route::get('lang/{lang}', '\Amamarul\LaravelJsonLocationsManager\Controllers\HomeController@lang')->name('lang');
         Route::get('lang/generateJson/{lang}', '\Amamarul\LaravelJsonLocationsManager\Controllers\HomeController@generateJson')->name('lang.generateJson');
@@ -367,7 +373,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
         Route::get('string/{code}', '\Amamarul\LaravelJsonLocationsManager\Controllers\HomeController@string')->name('lang.string');
         Route::get('publish-all', '\Amamarul\LaravelJsonLocationsManager\Controllers\HomeController@publishAll')->name('lang.publishAll');
         //Reinstall
-        Route::get('regenerate', function(){
+        Route::get('regenerate', function () {
             $currentDate = date('Y_m_d_hms');
             $newFileName = 'backup_' . $currentDate . '_locations.sqlite';
             $oldFilePath = storage_path('amamarul-locations/locations.sqlite');
@@ -382,12 +388,12 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
         })->name('lang.reinstall');
     });
     Route::post('translations/lang/update/{id}', '\Amamarul\LaravelJsonLocationsManager\Controllers\HomeController@update')->name('amamarul.translations.lang.update');
-    Route::post('translations/lang/update-all', function(\Illuminate\Http\Request $request){
-        
+    Route::post('translations/lang/update-all', function (\Illuminate\Http\Request $request) {
+
         $json = json_decode($request->data, true);
         $column_name = $request->lang;
 
-        foreach( $json as $code => $column_value ) {
+        foreach ($json as $code => $column_value) {
             ++$code;
             $test = \Amamarul\LaravelJsonLocationsManager\Models\Strings::select()
                 ->where('code', '=', $code)
@@ -395,13 +401,13 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
         }
 
         $lang = $column_name;
-        $list = \Amamarul\LaravelJsonLocationsManager\Models\Strings::pluck($lang,'en');
+        $list = \Amamarul\LaravelJsonLocationsManager\Models\Strings::pluck($lang, 'en');
         $new_json = json_encode_prettify($list);
 
         $filesystem = new \Illuminate\Filesystem\Filesystem;
 
-        $filesystem->put(base_path('lang/'.$lang.'.json'),$new_json);
-        return response()->json([ 'code' => 200 ], 200);
+        $filesystem->put(base_path('lang/' . $lang . '.json'), $new_json);
+        return response()->json(['code' => 200], 200);
 
     })->name('amamarul.translations.lang.update-all');
 

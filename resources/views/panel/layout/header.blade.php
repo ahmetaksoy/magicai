@@ -292,6 +292,10 @@
                                 <a class="dropdown-item {{activeRoute('dashboard.admin.frontend.generatorlist.index')}}" href="{{route('dashboard.admin.frontend.generatorlist.index')}}">
                                     {{__('Generators List Section')}}
                                 </a>
+
+								<a class="dropdown-item {{activeRoute('dashboard.admin.frontend.adZone.index')}}" href="{{route('dashboard.admin.frontend.adZone.index')}}">
+									{{__('Ads Zone Manager')}}
+								</a>
                             </div>
                         </li>
 
